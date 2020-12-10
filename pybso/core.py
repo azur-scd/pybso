@@ -21,16 +21,19 @@
 import pybso.crossref_api as crf
 import pybso.unpaywall_api as upw
 import pandas as pd
-from pkg_resources import resource_filename
+from os import path
+#from pkg_resources import resource_filename
 
 __all__ = ['unpaywall_data','crossref_publisher_normalized']
 
-sample = resource_filename('data', 'sample.csv')
+#sample = resource_filename('data', 'sample.csv')
+my_path = path.abspath(path.dirname(__file__))
+sample = path.join(my_path, "data/sample.csv")
 
-def unpaywall_data(inpath,outpath,email):
-    df_source = pd.read_csv(inpath)
+def unpaywall_data(inpath,outpath):
+    df_source = pd.read_csv(inpath,sep=None,engine = 'python',encoding = 'utf8')
     list_source = df_source.drop_duplicates(subset=['doi'], keep='last')["doi"].to_list()
-    df_upw = upw.upw_retrieval(list_source,email)
+    df_upw = upw.upw_retrieval(list_source)
     list_result = df_upw["source_doi"].tolist()
     df_result = pd.merge(df_source,df_upw, left_on='doi', right_on='source_doi',how="right").drop(columns=['source_doi'])
     print("Pourcentage de doi reconnus par Unpaywall : "+ "{:.2f}".format(df_upw.shape[0]/df_source.shape[0] * 100) + "%")
@@ -39,7 +42,7 @@ def unpaywall_data(inpath,outpath,email):
     return df_result
     
 def crossref_publisher_normalized(inpath,outpath,email):
-    df_source = pd.read_csv(inpath)
+    df_source = pd.read_csv(inpath,sep=None,engine = 'python',encoding = 'utf8')
     df_source["doi_prefix"] = df_source.apply (lambda row: row["doi"].partition("/")[0], axis=1)
     list_source = df_source.drop_duplicates(subset=['doi_prefix'], keep='last')["doi_prefix"].tolist()
     df_prefix_result = crf.crf_publisher_retrieval(list_source,email)

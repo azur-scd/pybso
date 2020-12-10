@@ -1,7 +1,7 @@
 pybso - Générateur de baromètre Open Access local
 ========================================================
 
-Ce module automatise la récupération des données et la production des graphiques pour la constitution d'un baromètre local de l'Open Access sur le modèle du baromètre national de la science ouverte développé par le MESRI
+Ce package automatise la récupération des données et la production des graphiques pour la constitution d'un baromètre local de l'Open Access sur le modèle du [baromètre national de la science ouverte](https://ministeresuprecherche.github.io/bso/) développé par le M.E.S.R.I.
 
 ## Installation
 Vous pouvez l'installer avec pip:
@@ -17,6 +17,13 @@ Ce package est optimisé pour une utilisation dans le cadre d'un Jupyter Noteboo
 [Voir le notebook de démo]("demo/demo_pybso.ipynb")
 
 ## Fonctionnement
+
+Le package propose un ensemble de fonctions prenant toutes en entrée un fichier csv et produisant parfois (pour les fonctions de récupération de données externes) un autre fichier csv de résultats à stocker sur votre PC.
+
+Ce mode de fonctionnement a été pensé pour :
+- archiver automatiquement les données moissonnées et donner la possibilité de les analyser autrement ou les intégrer dans des applications tierces ;
+- ne pas figer le tableau de bord sur une source unique et pouvoir moduler les graphiques à partir de fichiers différents ;
+- potentiellement pouvoir historiciser les données et afficher sur un même notebook des états différents d'OA pour le même corpus.
 
 Vous disposez de deux types de fonctions pour produire un baromètre local
 
@@ -54,9 +61,11 @@ Les anayses graphiques reprises du baromètre national sont celles relatives :
 - au taux d'accès ouvert par éditeur
 - au taux d'accès ouvert par type de publication
 
-L'analyse du taux d'accès ouvert par disciplines n'est pas pris en charge dans la mesure où cette donnée n'est pas présente dans les métadonnées Unpaywall (elle l'est dans cette autre API Crossref mais de manière inexploitable car très lacunaire), et nécessiterait par exemple la constitution d'un modèle de Machine Learning de classification supervisée qui s'appuierait sur la classification par apprentissage déjà effectuée pour le baromètre comme set d'entrainement, ce qui dépasse le cadre du package.
+L'analyse du taux d'accès ouvert par disciplines n'est pas pris en charge dans la mesure où cette donnée n'est pas présente dans les métadonnées Unpaywall (on peut retrouver une indextaion sujet via [cette autre API Crossref](https://api.crossref.org/works/10.1155/2014/413629) mais de manière inexploitable car très lacunaire). Cela nécessiterait par exemple la constitution d'un modèle de Machine Learning de classification supervisée qui s'appuierait sur la classification par apprentissage déjà effectuée pour le baromètre comme set d'entrainement, ce qui dépasse le cadre du package.
 
 ## Usage
+
+**Le caractère séparateur de votre fichier csv source est détecté automatiquement à l'import, vous pouvez donc par exemple utiliser comme séparateur la virgule, le point-virgule ou la tabulation**
 
 ### Moissonnage des données
 
@@ -64,19 +73,22 @@ L'analyse du taux d'accès ouvert par disciplines n'est pas pris en charge dans 
 
 #### Données Unpaywall
 
-    core.unpaywall_data(inpath,outpath,email)
+    core.unpaywall_data(inpath,outpath)
 
 Les 3 arguments à fournir sont
-- inpath : le chemin (relatif ou absolu) du fichier csv source. Celui-ci doit contenir au minimum une colonne nommée "doi", si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat
-- outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat
-- email : une adress mail valide pour l'utilisation de l'API Unpaywall. Aucune création de compte n'est demandée pour son utilisation mais ce paramètre permet aux producteurs du service de suivre son usage
+- inpath : le chemin (relatif ou absolu) du fichier csv source. Celui-ci doit contenir au minimum une colonne nommée "doi", si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat ;
+- outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat.
 
 Exemple
 
+    core.unpaywall_data("source_doi.csv","upw_output.csv")
+    
+ou
+
     source_path = "source_doi.csv"
-    result_path = "/result_files/upw_output.csv"
-    mail = "une_adresse_mail_valide"  
-    core.unpaywall_data(source_path,result_path,mail)
+    result_path = "upw_output.csv" # ou "C:/Users/xxxx/mon_barometre/upw_output.csv"
+    
+    core.unpaywall_data(source_path,result_path)
 
 **Remarques**
 
@@ -84,7 +96,7 @@ Bien que l'API Unpaywall réponde plutôt bien et que les requêtes soient paral
 
 La fonction renvoie un dataframe qu'il est possible d'assigner à une variable pour d'autres traitements éventuels.
 
-    df = core.unpaywall_data(source_path,result_path,mail)
+    df = core.unpaywall_data(source_path,result_path)
 
 Attention : le nombre d'enregistrements peut être inférieur au total initial car seuls les DOI reconnus sont conservés.
 
@@ -95,15 +107,20 @@ Sont également fournis le pourcentage de DOI connus d'Unpaywall (code réponse 
     core.crossref_publisher_normalized(inpath,outpath,email)
 
 Les 3 arguments à fournir sont
-- inpath : le chemin (relatif ou absolu) du fichier csv source. L'idée du package étant de faciliter et fluidifer l'obtention des données nécessaires, le fichier en entrée est idéalement le fichier résultat de l'étape précédente. Quoi qu'il en soit, celui-ci doit contenir au minimum une colonne nommée "doi", et si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat
-- outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat
-- email : une adress mail valide pour l'utilisation de l'API Crossref. Pas d'authentification requise pour l'utilisation gratuite de l'API Crossref mais son usage est encadré, et un requêtage abusif (selon Crossref) peut conduire à un blocage d'IP. Une bonne pratique recommandée consiste à ajouter une adresse mail en paramètre et à espacer les requêtes (1 seconde ici).
+- inpath : le chemin (relatif ou absolu) du fichier csv source. L'idée du package étant de faciliter et fluidifer l'obtention des données nécessaires, le fichier en entrée est idéalement le fichier résultat de l'étape précédente. Quoi qu'il en soit, celui-ci doit contenir au minimum une colonne nommée "doi", et si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat ;
+- outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat ;
+- email : une adress mail valide pour l'utilisation de l'API Crossref. Pas d'authentification requise pour l'utilisation gratuite de l'API Crossref mais son usage est surveillé, et un requêtage abusif (selon Crossref) peut conduire à un blocage d'IP. Une bonne pratique recommandée consiste à ajouter une adresse mail en paramètre et à espacer les requêtes (1 seconde ici).
 
 Exemple
 
-    source_path = "/result_files/upw_output.csv"
-    result_path = "/result_files/upw_crf_output.csv"
+    core.crossref_publisher_normalized("upw_output.csv","upw_crf_output.csv","une_adresse_mail_valide")
+    
+ou
+
+    source_path = "upw_output.csv"
+    result_path = "upw_crf_output.csv"
     mail = "une_adresse_mail_valide"   
+    
     core.crossref_publisher_normalized(source_path,result_path,mail)
 
 **Remarques**
@@ -114,7 +131,7 @@ La fonction renvoie un dataframe qu'il est possible d'assigner à une variable p
 
     df = core.crossref_publisher_normalized(source_path,result_path,mail)
 
-Sont également fournis le pourcentage de DOI présents dans la base Crossref (code réponse http 200) dans le fichier en entrée et la liste des DOI non traités car non valides.
+Sont également fournis le pourcentage de DOI présents dans la base Crossref (code réponse http 200) dans le fichier en entrée et la liste des DOI non traités car non reconnus.
 
 ### Visualisations
 
@@ -151,6 +168,12 @@ Exemple customisé (Les 5 éditeurs les plus immportants à partir de la donnée
 
     charts.oa_rate_by_publisher("votre_fichier.csv",publisher_field="publisher",n=5)
 
+#### Focus sur la part en OA : évolution des types d'Open Access (Gold, Green etc...)
+
+    charts.oa_by_status(path)
+    
+En argument, fournir le chemin (relatif ou absolu) vers un fichier issu des traitements précédents contenant les métadonnées d'Unpaywall retraitées.
+
 #### Exemple complet
     
 Paramètres de localisation des fichiers
@@ -161,7 +184,7 @@ Paramètres de localisation des fichiers
     
 API Unpaywall
 
-    core.unpaywall_data(source_path,upw_result_path,mail)   
+    core.unpaywall_data(source_path,upw_result_path)   
 ![](assets/unpaywall_data1.png) ![](assets/unpaywall_data2.png)
 
 Graphiques données OA
@@ -177,6 +200,9 @@ Graphiques données OA
 
     charts.oa_rate_by_type(upw_result_path)
 ![](assets/graph_oa_by_type.png)
+
+    charts.oa_by_status(upw_result_path)
+![](assets/graph_oa_by_status.png)
     
 Paramètre nouveau fichier
     upw_crf_result_path = "/result_files/upw_crf_output.csv"   
@@ -191,11 +217,22 @@ Graphique avec les noms éditeurs normalisés
     charts.oa_rate_by_publisher(upw_crf_result_path)
 ![](assets/graph_oa_by_pub_crf.png)
 
-Avant de vous lancer avec vos propres données, vous pouvez tester le package avec sur un fichier exemple inclus. Pour lancer le test : 
+Avant de vous lancer avec vos propres données, vous pouvez tester le package avec sur un fichier de démo inclus. Pour lancer le test : 
 
-    core.unpaywall_data(core.sample,"votre_resultfile.csv","votre_email") 
+    core.unpaywall_data(core.sample,"votre_resultfile.csv") 
+    
+## ToDo
 
-[Voir le notebook de démo]("demo/demo_pybso.ipynb")
+**Sur la forme**
+
+- permettre d'embedder les graphiques dans des iframes html
+
+**Sur le fond**
+
+- Enrichir les données OA avec d'autres sources : par exemple Dissemin via l'API mise à disposition
+- Compléter les données bibliographiques des publications avec les métadonnées Crossref, notamment 
+  - pour ré-évaluer la notion de date de publication qui n'est pas claire dans Unpaywall
+  - pour compléter les possibilités d'analyse avec les données des organismes de financement (registre funders de Crossref issu du référentiel Scopus) 
 
 ## Licence
 

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-    Ce module automatise la récupération des données et la production des graphiques pour la constitution d'un baromètre local de l'Open Access 
-    sur le modèle du baromètre national de la science ouverte développé par le MESRI
+    This package automates the harvesting and graphic formatting of data 
+    related to the opening of a set of publications identified by their doi.
 """
-__version__ = "0.1.4"
+__version__ = "0.1.0"

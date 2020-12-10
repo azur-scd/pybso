@@ -16,12 +16,15 @@
     >>> charts.oa_rate_by_host(path)
         path : relative or absolute path to a csv flat file resulting from the core Unpaywall functions
     >>> charts.oa_rate_by_type(path)
+        path : relative or absolute path to a csv flat file resulting from the core Unpaywall functions
+    >>> charts.oa_by_status(path)
         path : relative or absolute path to a csv flat file resulting from the core Unpaywall functions"""
 
+import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-__all__ = ['oa_rate','oa_rate_by_year','oa_rate_by_publisher','oa_rate_by_type']
+__all__ = ['oa_rate','oa_rate_by_year','oa_rate_by_publisher','oa_rate_by_type','oa_by_status']
 
 colors = {'Accès fermé': 'grey',
           'Accès ouvert': '#3288BD',
@@ -32,7 +35,7 @@ def oa_rate(path):
     if path is None:
         print("Error : unknown csv file path")
     else:
-        df = pd.read_csv(path)
+        df = pd.read_csv(path,sep=None,engine = 'python',encoding = 'utf8')
         list_order = ['Accès fermé','Accès ouvert','Editeur et archive ouverte', 'Archive ouverte', 'Editeur']
         g_outer = df["is_oa_normalized"].value_counts()
         g_inner = df["oa_host_type_normalized"].value_counts()
@@ -52,7 +55,7 @@ def oa_rate_by_year(path):
     if path is None:
         print("Error : unknown csv file path")
     else:
-        df = pd.read_csv(path)
+        df = pd.read_csv(path,sep=None,engine = 'python',encoding = 'utf8')
         df.year = df.year.astype(str)
         dc = pd.crosstab(df["year"], df["oa_host_type_normalized"],normalize='index').round(3)*100
         x=sorted(df[df.year.notna()].year.unique().tolist())
@@ -67,7 +70,7 @@ def oa_rate_by_publisher(path,publisher_field="publisher_by_doiprefix",n=10):
     if path is None:
         print("Error : unknown csv file path")
     else:
-        df = pd.read_csv(path)
+        df = pd.read_csv(path,sep=None,engine = 'python',encoding = 'utf8')
         filter_sort_index = df[publisher_field].value_counts().nlargest(n).keys()
         topten_list = filter_sort_index.tolist()
         grouped = df[df[publisher_field].isin(filter_sort_index)]
@@ -83,7 +86,7 @@ def oa_rate_by_type(path):
     if path is None:
         print("Error : unknown csv file path")
     else:
-        df = pd.read_csv(path)
+        df = pd.read_csv(path,sep=None,engine = 'python',encoding = 'utf8')
         dc = pd.crosstab(df["is_oa_normalized"], df["genre"],normalize='index').round(3)*100
         x=df["is_oa_normalized"].unique().tolist()
         fig = go.Figure()
@@ -93,6 +96,20 @@ def oa_rate_by_type(path):
         fig.update_xaxes(categoryorder='category ascending')
         return fig.show()
     
-
+def oa_by_status(path):
+    if path is None:
+        print("Error : unknown csv file path")
+    else:
+        df = pd.read_csv(path,sep=None,engine = 'python',encoding = 'utf8')
+        df.year = df.year.astype(str)
+        dc = pd.crosstab(df["year"], df[df["oa_status_normalized"] != "Closed"]["oa_status_normalized"])
+        x=sorted(df[df.year.notna()].year.unique().tolist())
+        fig = go.Figure()
+        for i in dc.columns:
+            fig.add_trace(go.Scatter(x=x, y=dc[i], name=i,text=dc[i].astype(int), mode="lines"))
+        fig.update_layout(title="Part Open Access : Evolution du type d'accès ouvert",uniformtext_minsize=10)
+        fig.update_xaxes(categoryorder='category ascending',type="category")
+        return fig.show()
+    
 if __name__ == "__main__":
-    oa_rate(),oa_rate_by_year(),oa_rate_by_publisher(),oa_rate_by_type()
+    oa_rate(),oa_rate_by_year(),oa_rate_by_publisher(),oa_rate_by_type(),oa_by_status()
