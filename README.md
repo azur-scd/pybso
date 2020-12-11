@@ -4,9 +4,14 @@ pybso - Générateur de baromètre Open Access local
 Ce package automatise la récupération des données et la production des graphiques pour la constitution d'un baromètre local de l'Open Access sur le modèle du [baromètre national de la science ouverte](https://ministeresuprecherche.github.io/bso/) développé par le M.E.S.R.I.
 
 ## Installation
-Vous pouvez l'installer avec pip:
+Vous pouvez l'installer avec [pip](https://pypi.org/project/pybso/):
 
     pip install pybso
+    
+## Import
+
+    import pybso.core as core
+    import pybso.charts as charts
 
 ## Remarques
 
@@ -57,25 +62,25 @@ La librairie graphique utilisée est Plotly, notamment pour ses fonctionnalités
 Les anayses graphiques reprises du baromètre national sont celles relatives : 
 
 - au taux global d'accès ouvert,
-- à l'évolution annuelle de ce taux (si le set de données couvre plusieurs années) 
+- à l'évolution annuelle de ce taux
 - au taux d'accès ouvert par éditeur
 - au taux d'accès ouvert par type de publication
 
-L'analyse du taux d'accès ouvert par disciplines n'est pas pris en charge dans la mesure où cette donnée n'est pas présente dans les métadonnées Unpaywall (on peut retrouver une indextaion sujet via [cette autre API Crossref](https://api.crossref.org/works/10.1155/2014/413629) mais de manière inexploitable car très lacunaire). Cela nécessiterait par exemple la constitution d'un modèle de Machine Learning de classification supervisée qui s'appuierait sur la classification par apprentissage déjà effectuée pour le baromètre comme set d'entrainement, ce qui dépasse le cadre du package.
+L'analyse du taux d'accès ouvert par disciplines n'est pas pris en charge dans la mesure où cette donnée n'est pas présente dans les métadonnées Unpaywall (on peut retrouver une indexation sujet par DOI via [cette API Crossref](https://api.crossref.org/works/10.1155/2014/413629) mais inexploitable car très lacunaire). 
+
+L'analyse par disciplines nécessiterait, par exemple, la constitution d'un modèle de Machine Learning de classification supervisée qui s'appuierait sur la classification par apprentissage déjà effectuée pour l'année 2018 dans le cadre du baromètre national comme set d'entrainement, ce qui dépasse le cadre du package.
 
 ## Usage
 
-**Le caractère séparateur de votre fichier csv source est détecté automatiquement à l'import, vous pouvez donc par exemple utiliser comme séparateur la virgule, le point-virgule ou la tabulation**
+**Le séparateur de votre fichier csv source est détecté automatiquement à l'import, vous pouvez donc par exemple utiliser comme séparateur la virgule, le point-virgule ou la tabulation**
 
 ### Moissonnage des données
-
-    import pybso.core as core
 
 #### Données Unpaywall
 
     core.unpaywall_data(inpath,outpath)
 
-Les 3 arguments à fournir sont
+Les 2 arguments à fournir à la fonction sont :
 - inpath : le chemin (relatif ou absolu) du fichier csv source. Celui-ci doit contenir au minimum une colonne nommée "doi", si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat ;
 - outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat.
 
@@ -98,9 +103,9 @@ La fonction renvoie un dataframe qu'il est possible d'assigner à une variable p
 
     df = core.unpaywall_data(source_path,result_path)
 
-Attention : le nombre d'enregistrements peut être inférieur au total initial car seuls les DOI reconnus sont conservés.
+Attention : le nombre d'enregistrements des résultats peut être inférieur au total initial car seuls les DOI reconnus sont conservés.
 
-Sont également fournis le pourcentage de DOI connus d'Unpaywall (code réponse http 200) dans le set de départ et la liste des DOI non traités car non reconnus. 
+Sont également fournis dans la réponse le pourcentage de DOI connus d'Unpaywall (code réponse http 200) dans le set de départ ainsi que la liste des DOI non traités car non reconnus. 
 
 #### Données Crossref (mention éditeur à partir du préfixe de DOI)
 
@@ -109,7 +114,7 @@ Sont également fournis le pourcentage de DOI connus d'Unpaywall (code réponse 
 Les 3 arguments à fournir sont
 - inpath : le chemin (relatif ou absolu) du fichier csv source. L'idée du package étant de faciliter et fluidifer l'obtention des données nécessaires, le fichier en entrée est idéalement le fichier résultat de l'étape précédente. Quoi qu'il en soit, celui-ci doit contenir au minimum une colonne nommée "doi", et si d'autres colonnes sont présentes elles seront conservées dans le fichier résultat ;
 - outpath : le chemin (relatif ou absolu) pour la sauvegarde du fichier produit en résultat ;
-- email : une adress mail valide pour l'utilisation de l'API Crossref. Pas d'authentification requise pour l'utilisation gratuite de l'API Crossref mais son usage est surveillé, et un requêtage abusif (selon Crossref) peut conduire à un blocage d'IP. Une bonne pratique recommandée consiste à ajouter une adresse mail en paramètre et à espacer les requêtes (1 seconde ici).
+- email : une adress mail valide pour l'utilisation de l'API Crossref. Pas d'authentification requise pour l'utilisation de l'API Crossref gratuite mais son usage est surveillé, et un requêtage abusif (selon Crossref) peut conduire à un blocage d'IP. Une bonne pratique recommandée consiste à ajouter une adresse mail en paramètre et à espacer les requêtes (1 seconde ici).
 
 Exemple
 
@@ -134,8 +139,6 @@ La fonction renvoie un dataframe qu'il est possible d'assigner à une variable p
 Sont également fournis le pourcentage de DOI présents dans la base Crossref (code réponse http 200) dans le fichier en entrée et la liste des DOI non traités car non reconnus.
 
 ### Visualisations
-
-    import pybso.charts as charts
 
 #### Taux global d'accès ouvert
 
@@ -178,9 +181,8 @@ En argument, fournir le chemin (relatif ou absolu) vers un fichier issu des trai
     
 Paramètres de localisation des fichiers
 
-    mail = "votre_email" 
     source_path = "votre_fichier_source_doi.csv"
-    upw_result_path = "/result_files/upw_output.csv"
+    upw_result_path = "upw_output.csv"
     
 API Unpaywall
 
@@ -204,8 +206,10 @@ Graphiques données OA
     charts.oa_by_status(upw_result_path)
 ![](assets/graph_oa_by_status.png)
     
-Paramètre nouveau fichier
-    upw_crf_result_path = "/result_files/upw_crf_output.csv"   
+Ajout données Crossref
+    
+    mail = "votre_email" 
+    upw_crf_result_path = "upw_crf_output.csv"   
     
 API Crossref
 
@@ -217,7 +221,13 @@ Graphique avec les noms éditeurs normalisés
     charts.oa_rate_by_publisher(upw_crf_result_path)
 ![](assets/graph_oa_by_pub_crf.png)
 
-Avant de vous lancer avec vos propres données, vous pouvez tester le package avec sur un fichier de démo inclus. Pour lancer le test : 
+On remarque que la clusterisation effectuée en prenant en compte le préfixe de DOI comme source de la mention d'éditeur peut conduite à modifier à la fois l'ordre d'importance des éditeurs et l'analyse des politiques OA par éditeur.
+
+### Données de démo
+
+Le package est livré avec un jeu de données de démo d'une cinquantaine de DOI.
+
+Avant de vous lancer avec vos propres données, vous pouvez tester le package sur ce petit dataset en l'appellant avec la variable core.sample : 
 
     core.unpaywall_data(core.sample,"votre_resultfile.csv") 
     
@@ -226,6 +236,7 @@ Avant de vous lancer avec vos propres données, vous pouvez tester le package av
 **Sur la forme**
 
 - permettre d'embedder les graphiques dans des iframes html
+- dash app basée sur le package
 
 **Sur le fond**
 
