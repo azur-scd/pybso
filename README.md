@@ -19,9 +19,9 @@ Le package ne traite pas la question des affiliations des publications et ne pre
 
 Ce package est optimisé pour une utilisation dans le cadre d'un Jupyter Notebook.
 
-[Voir le notebook de démo]("https://mybinder.org/v2/gh/gegedenice/pybso/master?filepath=%2Fdemo%2FDemo_pybso.ipynb")
+Un notebook de démo se trouve dans le dossier /demo/
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gegedenice/pybso/master?filepath=%2Fdemo%2FDemo_pybso.ipynb)
+Pour l'ouvrir en version exécutable : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gegedenice/pybso/master?filepath=%2Fdemo%2FDemo_pybso.ipynb)
 
 ## Fonctionnement
 
