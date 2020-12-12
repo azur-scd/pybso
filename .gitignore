@@ -1,5 +1,4 @@
 /.eggs
 /build
-/dist
 /pybso.egg-info
 .pypirc
