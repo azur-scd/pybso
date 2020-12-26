@@ -84,12 +84,6 @@ L'analyse par disciplines nécessiterait, par exemple, la constitution d'un mod�
 
 ## Usage
 
-**Les fonctions utilisent des arguments accessibles par mots-clés**
-
-Par exemple 
-
-     function(arg1=arg1,arg2=arg2...)
-
 **Si vous utilez des fichiers csv en entrée, le séparateur est détecté automatiquement à l'import, vous pouvez donc par exemple utiliser comme séparateur la virgule, le point-virgule ou la tabulation**
 
 ### Moissonnage des données
