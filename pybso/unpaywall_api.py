@@ -2,17 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """Module Unpaywall harvesting from a doi list, launched in parallel tasks and concatenate in a resulting dataframe.
-
-Usage:
-======
-
-    Unpaywall API by DOI : function upw_metadata(arg:doi)
-    doi: the doi identifier of the publication (type string)
-    Example : upw_metadata("10.1051/0004-6361/202037910")
-    
-    Unpaywall API for a list of doi: function upw_retrieval(arg1:doi_list)
-    doi_list: a list of single doi identifiers (type list)
-    Example : upw_retrieval(["10.1051/0004-6361/202037910","10.1016/j.asr.2020.09.009"],"mymail@example.com")
 """
 
 import pandas as pd
@@ -24,7 +13,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 upw_base_url = "https://api.unpaywall.org/v2/"
 
 def upw_metadata(doi):
-    """Get all Unpaywall metadata from a single doi"""       
+    """Get all Unpaywall metadata from a single doi
+       Parameter:
+           doi : str
+       Example : upw_metadata("10.1051/0004-6361/202037910")
+       Used by : upw_retrieval function
+    """       
     if doi is None:
         raise ValueError('DOI cannot be None')
     df_temp = pd.DataFrame()
@@ -40,7 +34,12 @@ def upw_metadata(doi):
     return df_temp
 
 def upw_retrieval(doi_list):
-    """Request function upw_metadata from a list of doi,filter result on a few fields and compile in a dataframe"""
+    """Request function upw_metadata from a list of doi,filter result on a few fields and compile in a dataframe
+       Parameters:
+           doi_list : list
+       Example : upw_retrieval(["10.1051/0004-6361/202037910","10.1016/j.asr.2020.09.009"])
+       Used by : core.py module
+    """
     processes = []
     df_collection = []
     fields = ["source_doi","genre","title","published_date","year","publisher","journal_name",
