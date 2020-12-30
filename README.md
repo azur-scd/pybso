@@ -23,6 +23,8 @@ Un notebook de démo se trouve dans le dossier /demo/
 
 Pour l'ouvrir en version exécutable : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gegedenice/pybso/master?filepath=%2Fdemo%2FDemo_pybso.ipynb)
 
+**Pour voir un exemple d'implémentation dans une application Python web (réalisée avec le framework Dash) : [démo en ligne](https://ggeoffroy.com/apps/pybso-dash/data), [code source et documentation](https://github.com/gegedenice/pybso-dash-app)**
+
 ## Fonctionnement
 
 Le package propose deux modules pensés pour être exécutés l'un à la suite de l'autre :
