@@ -23,7 +23,11 @@ Un notebook de démo se trouve dans le dossier /demo/
 
 Pour l'ouvrir en version exécutable : [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gegedenice/pybso/master?filepath=%2Fdemo%2FDemo_pybso.ipynb)
 
-**Pour voir un exemple d'implémentation dans une application Python web (réalisée avec le framework Dash) : [démo en ligne](https://ggeoffroy.com/apps/self-oa-barometre/data), [code source et documentation](https://github.com/gegedenice/self-oa-barometre)**
+## Exemples d'intégration applicative
+
+- Implémentation dans une application Python web (réalisée avec le framework Dash) : [démo en ligne](https://ggeoffroy.com/apps/self-oa-barometre/), [code source et documentation](https://github.com/gegedenice/self-oa-barometre)
+
+- Mini app Python Flask pour intégrer les graphiques du baromètre dans une page web : [démo en ligne](https://ggeoffroy.com/apps/pybso-embedded), [code source et documentation](https://github.com/gegedenice/pybso-embedded)
 
 ## Fonctionnement
 
