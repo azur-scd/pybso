@@ -145,9 +145,10 @@ def oa_rate_by_publisher(**kwargs):
     grouped = df[df[publisher_field].isin(filter_sort_index)]
     dc = pd.crosstab(grouped[publisher_field], grouped["oa_host_type_normalized"],normalize='index').round(3)*100
     y=sorted(grouped[publisher_field].unique().tolist(), key=lambda x: topten_list.index(x),reverse=True)
+    dd = dc.reindex(y, axis="index")
     fig = go.Figure()
-    for i in dc.columns:
-        fig.add_trace(go.Bar(y=y, x=dc[i], name=i,text=dc[i].astype(int),textposition='auto',marker={'color': colors[i]},orientation='h'))
+    for i in dd.columns:
+        fig.add_trace(go.Bar(y=y, x=dd[i], name=i,text=dd[i].astype(int),textposition='auto',marker={'color': colors[i]},orientation='h'))
     fig.update_layout(title="Taux d'accès ouvert aux publications par éditeur",barmode='stack',uniformtext_minsize=10)
     return fig
     
